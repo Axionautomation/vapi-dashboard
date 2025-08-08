@@ -2,7 +2,7 @@ name: Call History Cron Job
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Every hour
+    - cron: '0 18 * * *'  # Daily at 6 PM UTC
   workflow_dispatch:  # Allow manual trigger
 
 jobs:

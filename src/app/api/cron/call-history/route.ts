@@ -122,9 +122,9 @@ export async function POST(request: NextRequest) {
         try {
           console.log(`[CRON] Fetching calls for assistant: ${assistant.name} (${assistant.vapi_assistant_id})`)
           
-          // Fetch calls from Vapi (last 24 hours by default)
-          const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-          const calls = await fetchCallsFromVapi(assistant.vapi_assistant_id, 100, oneDayAgo)
+          // Fetch calls from Vapi (last 7 days since we run daily)
+          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+          const calls = await fetchCallsFromVapi(assistant.vapi_assistant_id, 500, sevenDaysAgo)
           
           let assistantCallsProcessed = 0
 

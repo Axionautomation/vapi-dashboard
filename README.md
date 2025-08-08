@@ -128,7 +128,7 @@ npm start
 
 The dashboard includes automated data collection:
 
-- **Call History Sync**: Every hour
+- **Call History Sync**: Daily at 6 PM UTC
 - **Analytics Refresh**: On-demand and automated
 - **Assistant Status Updates**: Real-time
 
@@ -137,8 +137,8 @@ The dashboard includes automated data collection:
 If not using Vercel, set up external cron:
 
 ```bash
-# Every hour
-0 * * * * curl -X POST https://your-domain.com/api/cron/call-history \
+# Daily at 6 PM UTC
+0 18 * * * curl -X POST https://your-domain.com/api/cron/call-history \
   -H "Authorization: Bearer your-cron-secret"
 ```
 
