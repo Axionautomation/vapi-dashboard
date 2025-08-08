@@ -1,0 +1,109 @@
+# 📊 Vapi Client Analytics Dashboard
+
+A web-based dashboard that gives clients live insights into their voice assistant performance using real call data and AI analysis. Built with Next.js and integrated with Vapi, this dashboard lets users track call volume, appointment bookings, call outcomes, and performance over time.
+
+---
+
+## ✅ Key Features
+
+### 1. 📈 Real-Time Usage Analytics
+- Total calls today / this week / this month
+- Number of successful appointments booked
+- Average call duration
+- Booking success rate (calculated via AI)
+- Filter by date, status, duration, and outcome
+
+---
+
+### 2. 🔊 Call Recording & Transcription
+- Auto-log call recordings from Vapi webhook
+- Transcribe calls using OpenAI Whisper or AssemblyAI
+- View full transcript and listen to call playback
+- Stored securely and indexed per client
+
+---
+
+### 3. 🧠 AI-Based Call Outcome Detection
+- Analyze transcripts using OpenAI
+- Classify whether the call resulted in a:
+  - Successful appointment
+  - Missed opportunity
+  - Incomplete or spam call
+- Store structured metadata:
+  - `"booked": true/false`
+  - `"intent": "book/cancel/reschedule/etc"`
+  - `"summary": "Booked for Friday at 3PM"`
+
+---
+
+### 4. 📅 Visual Reports & Charts
+- Line chart: Bookings over time
+- Pie chart: Booking success ratio
+- Bar graph: Calls vs successful bookings
+- Time-of-day heatmap (optional)
+
+---
+
+### 5. 🗂️ Call Logs Table
+- Call ID
+- Date & time
+- Caller phone number
+- Duration
+- Status: Success / Fail / Unknown
+- Transcript summary
+- Audio playback
+
+---
+
+### 6. 👤 Secure Client Access
+- Auth for client-specific dashboards (Supabase Auth or Clerk)
+- Each client sees only their own calls and analytics
+- Admin access for overview of all clients (optional)
+
+---
+
+### 7. 📬 Notifications & Exports (Optional)
+- Weekly or monthly email reports
+- Slack notifications for failed/flagged calls
+- Export logs and analytics as CSV or PDF
+
+---
+
+## 🧱 Stack Overview
+
+**Frontend**
+- Next.js (App Router)
+- Tailwind CSS + Shadcn UI
+- Recharts (visuals)
+- React Query or SWR (data fetching)
+- Lucide-react (icons)
+- Framer Motion (animations)
+- Zod + React Hook Form (validation)
+
+**Backend**
+- Supabase or PostgreSQL (data storage)
+- Next.js API Routes or tRPC
+- Whisper / AssemblyAI (transcription)
+- OpenAI / LangChain (NLP call analysis)
+- Vapi Webhooks (incoming call data)
+- CRON job or queue for async processing
+
+---
+
+## 🚧 Upcoming Features
+
+- Role-based access control (admin/client/support)
+- Stripe billing integration per call/minute
+- Team-wide performance metrics
+- NLP feedback quality scoring
+- Client feedback rating per call
+
+---
+
+## 📦 Installation Dependencies
+
+```bash
+pnpm add @shadcn/ui tailwindcss lucide-react framer-motion \
+react-query zod react-hook-form clsx \
+@tanstack/react-query supabase-js \
+recharts openai

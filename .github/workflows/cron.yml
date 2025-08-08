@@ -1,0 +1,16 @@
+name: Call History Cron Job
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  call-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Call History Update
+        run: |
+          curl -X POST ${{ secrets.APP_URL }}/api/cron/call-history \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

@@ -1,36 +1,185 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vapi Dashboard
 
-## Getting Started
+A comprehensive analytics dashboard for Vapi voice assistants with real-time call tracking, analytics, and management features.
 
-First, run the development server:
+## Features
+
+- 📊 **Real-time Analytics** - Live insights into voice assistant performance
+- 📞 **Call History** - Complete call tracking with transcripts
+- 🤖 **Assistant Management** - Create, edit, and manage voice assistants
+- 🔄 **Automated Data Sync** - Hourly cron jobs to keep data fresh
+- 🌙 **Dark Mode** - Beautiful dark/light theme support
+- 📱 **Responsive Design** - Works on desktop and mobile
+- 🔐 **Authentication** - Secure user authentication with Supabase
+- 📈 **Export Data** - Export analytics and call history to CSV
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React, TypeScript
+- **Styling**: Tailwind CSS, Shadcn UI
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **API**: Vapi API for voice assistant data
+- **Deployment**: Vercel
+- **Charts**: Recharts
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ 
+- Supabase account
+- Vapi account with API key
+
+### 1. Clone and Install
+
+```bash
+git clone <your-repo-url>
+cd vapi-dashboard
+npm install
+```
+
+### 2. Environment Setup
+
+Create `.env.local` file:
+
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Vapi
+VAPI_API_KEY=your-vapi-api-key
+
+# Cron Job (optional)
+CRON_SECRET=your-secure-random-string
+```
+
+### 3. Database Setup
+
+Run the SQL migrations in your Supabase SQL editor:
+
+1. **Initial Setup**: `database-setup.sql`
+2. **Analytics Enhancement**: `analytics-enhancement-migration.sql`
+3. **Call History**: `call-history-migration.sql`
+
+### 4. Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Vercel (Recommended)
 
-## Learn More
+1. **Connect to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Deploy to Vercel**:
+   - Connect your GitHub repo to Vercel
+   - Add environment variables in Vercel dashboard
+   - Deploy automatically on every push
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Set up Cron Jobs**:
+   - Vercel will automatically use the `vercel.json` configuration
+   - Add `CRON_SECRET` to your environment variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Manual Deployment
 
-## Deploy on Vercel
+```bash
+npm run build
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Environment Variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
+| `VAPI_API_KEY` | Vapi API key | Yes |
+| `CRON_SECRET` | Secret for cron job authentication | No |
+
+## API Endpoints
+
+### Analytics
+- `GET /api/analytics` - Get analytics data
+- `POST /api/analytics` - Query Vapi analytics with filters
+
+### Assistants
+- `GET /api/assistants` - Get user's assistants
+- `POST /api/assistants` - Create new assistant
+- `PATCH /api/assistants/[id]` - Update assistant
+- `DELETE /api/assistants/[id]` - Delete assistant
+
+### Call History
+- `GET /api/call-history` - Get call history with filters
+- `POST /api/call-history` - Fetch and store call data
+- `POST /api/cron/call-history` - Automated cron job endpoint
+
+## Cron Jobs
+
+The dashboard includes automated data collection:
+
+- **Call History Sync**: Every hour
+- **Analytics Refresh**: On-demand and automated
+- **Assistant Status Updates**: Real-time
+
+### Manual Cron Job Setup
+
+If not using Vercel, set up external cron:
+
+```bash
+# Every hour
+0 * * * * curl -X POST https://your-domain.com/api/cron/call-history \
+  -H "Authorization: Bearer your-cron-secret"
+```
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js app router
+│   ├── analytics/         # Analytics dashboard
+│   ├── assistants/        # Assistant management
+│   ├── call-history/      # Call history page
+│   ├── dashboard/         # Main dashboard
+│   ├── api/              # API routes
+│   └── ...
+├── components/            # React components
+│   ├── ui/               # Shadcn UI components
+│   └── ...
+├── contexts/             # React contexts
+├── hooks/                # Custom hooks
+└── lib/                  # Utility functions
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Support
+
+For issues and questions:
+- Create an issue on GitHub
+- Check the documentation
+- Review the code comments
+
+---
+
+Built with ❤️ for Vapi voice assistants
