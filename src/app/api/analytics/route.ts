@@ -167,39 +167,58 @@ export async function GET(request: NextRequest) {
 
     console.log('Fetching analytics for user:', session.user.email)
 
-    // Fetch data from Vapi
+    // Parse optional assistant filter from query string (comma-separated list)
+    const { searchParams } = new URL(request.url)
+    const assistantIdsParam = searchParams.get('assistantIds') // e.g. id1,id2,id3
+
+    // Fetch data from Vapi once and cache locally
     const [calls, logs] = await Promise.all([
       fetchCallsFromVapi(),
       fetchLogsFromVapi()
     ])
 
-    // Process the data
-    const analytics = processCallsData(calls)
-
-    // Get user's assistants for performance metrics
+    // Get user's assistants for performance metrics / filtering
     const { data: userAssistants } = await supabase
       .from('assistants')
       .select('*')
       .eq('user_id', session.user.id)
 
-    // Calculate assistant performance
-    const assistantPerformance = (userAssistants || []).map(assistant => {
-      const assistantCalls = calls.filter((call: any) => call.assistantId === assistant.vapi_assistant_id)
-      const assistantSuccessful = assistantCalls.filter((call: any) => 
-        call.status === 'ended' && call.endedReason === 'assistant-ended-call'
-      ).length
-      const assistantSuccessRate = assistantCalls.length > 0 ? (assistantSuccessful / assistantCalls.length) * 100 : 0
-      const assistantAvgDuration = assistantCalls.filter((call: any) => call.duration).length > 0
-        ? assistantCalls.filter((call: any) => call.duration).reduce((sum: number, call: any) => sum + (call.duration || 0), 0) / assistantCalls.filter((call: any) => call.duration).length / 60
-        : 0
+    // Determine the set of assistantIds we should keep
+    const userAssistantIds = (userAssistants || []).map(a => a.vapi_assistant_id)
+    let effectiveAssistantIds = userAssistantIds
 
-      return {
-        name: assistant.name,
-        calls: assistantCalls.length,
-        successRate: Math.round(assistantSuccessRate * 100) / 100,
-        avgDuration: Math.round(assistantAvgDuration * 100) / 100
-      }
-    })
+    if (assistantIdsParam) {
+      const requestedIds = assistantIdsParam.split(',').map(id => id.trim()).filter(Boolean)
+      // Only keep ids that belong to this user to prevent leaking data across users
+      effectiveAssistantIds = requestedIds.filter(id => userAssistantIds.includes(id))
+    }
+
+    // Filter calls to only those assistants
+    const filteredCalls = calls.filter((call: any) => effectiveAssistantIds.includes(call.assistantId))
+
+    // Process the data
+    const analytics = processCallsData(filteredCalls)
+
+    // Calculate assistant performance for *filtered* assistants only
+    const assistantPerformance = (userAssistants || [])
+      .filter(assistant => effectiveAssistantIds.includes(assistant.vapi_assistant_id))
+      .map(assistant => {
+        const assistantCalls = filteredCalls.filter((call: any) => call.assistantId === assistant.vapi_assistant_id)
+        const assistantSuccessful = assistantCalls.filter((call: any) => 
+          call.status === 'ended' && call.endedReason === 'assistant-ended-call'
+        ).length
+        const assistantSuccessRate = assistantCalls.length > 0 ? (assistantSuccessful / assistantCalls.length) * 100 : 0
+        const assistantAvgDuration = assistantCalls.filter((call: any) => call.duration).length > 0
+          ? assistantCalls.filter((call: any) => call.duration).reduce((sum: number, call: any) => sum + (call.duration || 0), 0) / assistantCalls.filter((call: any) => call.duration).length / 60
+          : 0
+
+        return {
+          name: assistant.name,
+          calls: assistantCalls.length,
+          successRate: Math.round(assistantSuccessRate * 100) / 100,
+          avgDuration: Math.round(assistantAvgDuration * 100) / 100
+        }
+      })
 
     return NextResponse.json({
       analytics,
